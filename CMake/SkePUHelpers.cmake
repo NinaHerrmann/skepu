@@ -221,7 +221,7 @@ function(skepu_add_executable name)
 	# dealing with CUDA or C++, so we do not have to care about that.
 	add_executable(${name} ${_exclude_from_all} ${_precompiled_src} ${_src})
 	target_include_directories(${name} PRIVATE ${_output_dir})
-	target_link_libraries(${name} PRIVATE ${_target_libs})
+	target_link_libraries(${name} PRIVATE ${_target_libs} ${MPI_CXX_LINK_FLAGS} ${MPI_CXX_LIBRARIES})
 	target_compile_options(${name} PRIVATE ${_target_cxxflags})
 	add_dependencies(${name} ${_skepu_targets})
 endfunction(skepu_add_executable)

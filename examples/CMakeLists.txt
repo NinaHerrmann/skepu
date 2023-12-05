@@ -48,7 +48,7 @@ if(SKEPU_EXAMPLES_SEQ)
 		string(TOUPPER ${example} ucname)
 		if(SKEPU_EXAMPLE_${ucname})
 			add_executable(${example}_seq ${example}.cpp)
-			target_link_libraries(${example}_seq PRIVATE SkePU::SkePU)
+			target_link_libraries(${example}_seq PRIVATE SkePU::SkePU ${MPI_CXX_LINK_FLAGS} ${MPI_CXX_LIBRARIES})
 			set_target_properties(${example}_seq
 				PROPERTIES
 					RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/sequential
@@ -86,7 +86,8 @@ if(SKEPU_EXAMPLES_PAR)
 			skepu_add_executable(${example}_par
 				${${example}_par_backends}
 				SKEPUSRC ${example}.cpp)
-
+			target_compile_options(${example}_par PRIVATE "-I/usr/lib/x86_64-linux-gnu/openmpi/include/" "-Iusr/lib/x86_64-linux-gnu/openmpi/include/openmpi")
+			target_link_options(${example}_par PRIVATE ${MPI_CXX_LIBRARIES})
 			set_target_properties(${example}_par
 				PROPERTIES
 					RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/parallel

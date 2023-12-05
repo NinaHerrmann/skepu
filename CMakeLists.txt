@@ -5,7 +5,11 @@ project(SkePU VERSION 3.0.0.1
 	DESCRIPTION
 		"A C++11/CUDA/OpenCL skeleton framework with smart containers"
 	LANGUAGES CXX)
-
+find_package(MPI REQUIRED)
+include_directories(${MPI_INCLUDE_PATH})
+message(STATUS "mpi compiler: " ${MPI_CXX_COMPILER})
+message(STATUS "mpi libraries: " ${MPI_CXX_LIBRARIES})
+message(STATUS "mpi include paths: " ${MPI_CXX_INCLUDE_PATH})
 # Initialize CMAKE_CUDA_ARCHITECTURES automatically if cmake version >= 3.18
 if(POLICY CMP0104)
 	cmake_policy(SET CMP0104 NEW)
