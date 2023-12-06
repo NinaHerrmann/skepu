@@ -55,6 +55,7 @@ float heat4D(skepu::Region4D<float> r)
 
 int main(int argc, char *argv[])
 {
+    double timeStart = MPI_Wtime();
 
     MPI_Init(&argc, &argv); //initialize MPI operations
 
@@ -96,7 +97,6 @@ int main(int argc, char *argv[])
 #if ENABLE_2D_EXAMPLE
 	if (dim == 2)
 	{
-        double timeStart = MPI_Wtime();
 
         auto update = skepu::MapOverlap(heat2D);
 		update.setOverlap(1, 1);
@@ -104,8 +104,10 @@ int main(int argc, char *argv[])
         update.setPad(0);
         update.setUpdateMode(skepu::UpdateMode::Normal);
 		skepu::Matrix<float> domain(size, size, 0);
-		
-		for (size_t i = 0; i < size; ++i)
+        double beforefill = MPI_Wtime();
+        double timeinit = beforefill-timeStart;
+
+        for (size_t i = 0; i < size; ++i)
 		{
 			domain(i, 0) = 2;
 			domain(i, size-1) = 2;
@@ -118,7 +120,7 @@ int main(int argc, char *argv[])
 		}
         // Record stop event
         double init = MPI_Wtime();
-        double timeinit = init-timeStart;
+        double timefill = init-beforefill;
 		for (size_t i = 0; i < iters; ++i) {
             update(domain, domain);
             update(domain, domain);
@@ -146,7 +148,7 @@ int main(int argc, char *argv[])
 
         std::string fileName = "runtime-opencl-d2-s" + std::to_string(size) + "-i" + std::to_string(iters) + ".out";
         std::ofstream outputFile(fileName, std::ios::app); // append file or create a file if it does not exist
-        outputFile << "2" << ";" <<  size << ";" << iters << ";" << timeinit << ";" << timecalc << ";"
+        outputFile << "2" << ";" <<  size << ";" << iters << ";" << timeinit << ";" << timefill << ";" << timecalc << ";"
                    << totaltime << "\n"; // write
         outputFile.close();
 
@@ -158,15 +160,14 @@ int main(int argc, char *argv[])
 #if ENABLE_3D_EXAMPLE
 	if (dim == 3)
 	{
-        double timeStart = MPI_Wtime();
-
         auto update = skepu::MapOverlap(heat3D);
 		update.setOverlap(1, 1, 1);
         update.setEdgeMode(skepu::Edge::Pad);
         update.setPad(0);
-        update.setUpdateMode(skepu::UpdateMode::RedBlack);
+        update.setUpdateMode(skepu::UpdateMode::Normal);
 		skepu::Tensor3<float> domain(size, size, size, 0);
-		
+        double beforefill = MPI_Wtime();
+        double timeinit = beforefill-timeStart;
 		for (size_t i = 0; i < size; ++i) {
 			for (size_t j = 0; j < size; ++j) {
 				domain(0, i, j) = 1;
@@ -176,18 +177,18 @@ int main(int argc, char *argv[])
 			}
 		}
         double init = MPI_Wtime();
-        double timeinit = init-timeStart;
+        double timefill = init-beforefill;
 
         for (size_t i = 0; i < iters; ++i) {
 			update(domain, domain);
-			//update(domain, domain);
+			update(domain, domain);
 		}
         double calc = MPI_Wtime();
         double timecalc = calc-init;
 
-        if (true) {
+        if (output) {
             skepu::external(skepu::read(domain), [&] {
-                std::string fileName = "d3-s" + std::to_string(size) + "-i" + std::to_string(iters) + ".out";
+                std::string fileName = "d3-opencl-s" + std::to_string(size) + "-i" + std::to_string(iters) + ".out";
                 std::ofstream outputFile(fileName, std::ios::app); // append file or create a file if it does not exist
                 for (int x = 0; x < size; x++) {
                     for (int y = 0; y < size; y++) {
