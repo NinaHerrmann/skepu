@@ -70,7 +70,9 @@ int main(int argc, char *argv[])
 	const int iters = atof(argv[3]);
 	const int output = atof(argv[5]);
 	auto spec = skepu::BackendSpec{argv[4]};
-	skepu::setGlobalBackendSpec(spec);
+        const int gpus = atof(argv[6]);
+	
+skepu::setGlobalBackendSpec(spec);
 
 #if ENABLE_1D_EXAMPLE
 	if (dim == 1)
@@ -131,7 +133,7 @@ int main(int argc, char *argv[])
         // Write out result
         if (output) {
             skepu::external(skepu::read(domain), [&] {
-                std::string fileName = "opencl-d2-s" + std::to_string(size) + "-i" + std::to_string(iters) + ".out";
+                std::string fileName = "opencl-d2-s" + std::to_string(size) + "-i" + std::to_string(iters) + "-g" + std::to_string(gpus) + ".out";
                 std::ofstream outputFile(fileName, std::ios::app); // append file or create a file if it does not exist
                 for (int x = 0; x < size; x++) {
                     for (int y = 0; y < size; y++) {
@@ -146,7 +148,7 @@ int main(int argc, char *argv[])
         double endTime = MPI_Wtime();
         double totaltime = endTime - timeStart;
 
-        std::string fileName = "runtime-opencl-d2-s" + std::to_string(size) + "-i" + std::to_string(iters) + ".out";
+        std::string fileName = "runtime-opencl-d2-s" + std::to_string(size) + "-i" + std::to_string(iters) + "-g" + std::to_string(gpus) + ".out";
         std::ofstream outputFile(fileName, std::ios::app); // append file or create a file if it does not exist
         outputFile << "2" << ";" <<  size << ";" << iters << ";" << timeinit << ";" << timefill << ";" << timecalc << ";"
                    << totaltime << "\n"; // write
@@ -188,7 +190,7 @@ int main(int argc, char *argv[])
 
         if (output) {
             skepu::external(skepu::read(domain), [&] {
-                std::string fileName = "d3-opencl-s" + std::to_string(size) + "-i" + std::to_string(iters) + ".out";
+                std::string fileName = "d3-opencl-s" + std::to_string(size) + "-i" + std::to_string(iters) + "-g" + std::to_string(gpus) + ".out";
                 std::ofstream outputFile(fileName, std::ios::app); // append file or create a file if it does not exist
                 for (int x = 0; x < size; x++) {
                     for (int y = 0; y < size; y++) {
@@ -204,7 +206,7 @@ int main(int argc, char *argv[])
         }
         double endTime = MPI_Wtime();
         double totaltime = endTime - timeStart;
-        std::string fileName = "runtime-opencl-d3-s" + std::to_string(size) + "-i" + std::to_string(iters) + ".out";
+        std::string fileName = "runtime-opencl-d3-s" + std::to_string(size) + "-i" + std::to_string(iters) + "-g" + std::to_string(gpus) + ".out";
         std::ofstream outputFile(fileName, std::ios::app); // append file or create a file if it does not exist
         outputFile << "3" << ";" <<  size << ";" << iters << ";" << timeinit << ";" << timecalc << ";"
                    << totaltime << "\n"; // write
